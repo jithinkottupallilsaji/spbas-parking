@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkWise MLCP Solutions</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    nav a:hover {
+      background-color: #0055aa;
+    }
+    .hero {
+      background: url("{% static 'parkwise_app/parking-entrance.png' %}") center center/cover no-repeat;
+      color: white;
+      flex: 1;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 51, 102, 0.6);
+      z-index: 1;
+    }
+    .hero h1, .hero button {
+      position: relative;
+      z-index: 2;
+    }
+    .hero h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+    .hero button {
+      background-color: #ffcc00;
+      color: #003366;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .hero button:hover {
+      background-color: #e6b800;
+    }
+    footer {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 22px;
+        flex: 1 1 100%;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      nav {
+        flex: 1 1 100%;
+        justify-content: center;
+        gap: 10px;
+      }
+      nav a {
+        font-size: 14px;
+        padding: 8px 14px;
+      }
+      .hero {
+        height: 300px;
+      }
+      .hero h1 {
+        font-size: 24px;
+        padding: 0 10px;
+      }
+      .hero button {
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ParkWise MLCP Solutions</div>
+    <nav>
+      <a href="#">About Us</a>
+      <a href="#">Contact Us</a>
+      <a href="{% url 'signup' %}">Sign Up</a>
+      <a href="{% url 'login' %}">Login</a>
+      <a href="#" style="background-color: #007BFF;">Book Parking</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Soliciting valuable feedback to continuously enhance reserved parking services for employees and visitors.</h1>
+    <button>Get in Touch</button>
+  </section>
+
+  <footer>
+    &copy; 2025 ParkWise MLCP Solutions. All rights reserved.
+  </footer>
+</body>
+</html>

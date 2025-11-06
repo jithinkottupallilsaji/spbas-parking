@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ParkWise MLCP Solutions</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-blue-600: rgba(28, 84, 152, 1);
+            --color-blue-700: rgba(20, 60, 110, 1);
+            --color-yellow-500: rgba(255, 193, 7, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-blue-600);
+            --color-primary-hover: var(--color-blue-700);
+            --color-accent: var(--color-yellow-500);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --duration-normal: 250ms;
+            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-btn-primary-text: var(--color-slate-900);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: linear-gradient(135deg, #1c5498 0%, #2d5a8a 50%, #4a7ba7 100%);
+            color: var(--color-text);
+            line-height: 1.5;
+            padding: var(--space-32);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 450px;
+            width: 100%;
+            padding: var(--space-32);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .login-header h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-8);
+        }
+
+        .login-header p {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-8);
+        }
+
+        .form-label .required {
+            color: var(--color-error);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space-12);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            transition: border-color var(--duration-normal) var(--ease-standard);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        .form-control.error {
+            border-color: var(--color-error);
+        }
+
+        .error-message {
+            display: none;
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-8);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: var(--space-12);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            padding: var(--space-8);
+        }
+
+        .toggle-password:hover {
+            color: var(--color-primary);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-24);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+            font-size: var(--font-size-sm);
+        }
+
+        .remember-me input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            font-size: var(--font-size-sm);
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color var(--duration-normal) var(--ease-standard);
+        }
+
+        .forgot-password:hover {
+            color: var(--color-primary-hover);
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: var(--space-12) var(--space-24);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-standard);
+        }
+
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: #1c3c5a;
+        }
+
+        .btn-primary:hover {
+            background-color: #ffb300;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: var(--space-24) 0;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--color-border);
+        }
+
+        .divider span {
+            padding: 0 var(--space-12);
+        }
+
+        .social-login {
+            display: flex;
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+        }
+
+        .btn-social {
+            flex: 1;
+            padding: var(--space-12);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-standard);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-8);
+        }
+
+        .btn-social:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-primary);
+        }
+
+        .signup-link {
+            text-align: center;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-24);
+        }
+
+        .signup-link a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .caps-lock-warning {
+            display: none;
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-8);
+            padding: var(--space-8);
+            background-color: rgba(var(--color-error), 0.1);
+            border-radius: var(--radius-base);
+        }
+
+        .caps-lock-warning.show {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: var(--space-16);
+            }
+
+            .login-container {
+                padding: var(--space-24);
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: var(--space-12);
+                align-items: flex-start;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Login to ParkWise MLCP Solutions</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                <div class="error-message" id="emailError">Please enter a valid email address</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password <span class="required">*</span></label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" id="togglePassword">Show</button>
+                </div>
+                <div class="caps-lock-warning" id="capsLockWarning">⚠️ Caps Lock is ON</div>
+                <div class="error-message" id="passwordError">Please enter your password</div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <div class="social-login">
+                <button type="button" class="btn-social">
+                    <svg width="18" height="18" viewBox="0 0 18 18">
+                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/>
+                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    Google
+                </button>
+                <button type="button" class="btn-social">
+                    <svg width="18" height="18" viewBox="0 0 18 18">
+                        <path fill="currentColor" d="M18 9C18 4.03 13.97 0 9 0S0 4.03 0 9c0 4.49 3.29 8.21 7.59 8.88V11.6H5.31V9h2.28V7.01c0-2.25 1.34-3.49 3.39-3.49.98 0 2.01.18 2.01.18v2.21h-1.13c-1.11 0-1.46.69-1.46 1.4V9h2.49l-.4 2.6H10.4v6.28C14.71 17.21 18 13.49 18 9z"/>
+                    </svg>
+                    Facebook
+                </button>
+            </div>
+
+            <div class="signup-link">
+                Don't have an account? <a href="{% url 'signup' %}">Sign up now</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Form validation
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const capsLockWarning = document.getElementById('capsLockWarning');
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+
+        // Caps Lock detection
+        passwordInput.addEventListener('keyup', (e) => {
+            if (e.getModifierState('CapsLock')) {
+                capsLockWarning.classList.add('show');
+            } else {
+                capsLockWarning.classList.remove('show');
+            }
+        });
+
+        // Email validation
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Show/hide error messages
+        function showError(fieldId, errorId) {
+            document.getElementById(fieldId).classList.add('error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        function hideError(fieldId, errorId) {
+            document.getElementById(fieldId).classList.remove('error');
+            document.getElementById(errorId).classList.remove('show');
+        }
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            let isValid = true;
+
+            // Validate email
+            if (!validateEmail(emailInput.value.trim())) {
+                showError('email', 'emailError');
+                isValid = false;
+            } else {
+                hideError('email', 'emailError');
+            }
+
+            // Validate password
+            if (passwordInput.value.trim() === '') {
+                showError('password', 'passwordError');
+                isValid = false;
+            } else {
+                hideError('password', 'passwordError');
+            }
+
+            if (isValid) {
+                // Submit form data
+                console.log('Login attempt:', {
+                    email: emailInput.value,
+                    password: passwordInput.value,
+                    rememberMe: document.getElementById('rememberMe').checked
+                });
+                
+                // In production, this would send data to Django backend
+                alert('Login successful! (This is a demo)');
+            }
+        });
+
+        // Clear error on input
+        emailInput.addEventListener('input', () => {
+            hideError('email', 'emailError');
+        });
+
+        passwordInput.addEventListener('input', () => {
+            hideError('password', 'passwordError');
+        });
+    </script>
+</body>
+</html>

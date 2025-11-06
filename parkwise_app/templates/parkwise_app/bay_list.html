@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Parking Bays</title></head>
+<body>
+    <h1>Parking Bays</h1>
+    <ul>
+        {% for bay in bays %}
+            <li>
+                {{ bay.number }} –
+                {% if bay.available %}Available{% else %}Occupied{% endif %}
+            </li>
+        {% empty %}
+            <li>No bays found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

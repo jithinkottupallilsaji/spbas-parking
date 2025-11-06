@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Signup Form</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-blue-600: rgba(28, 84, 152, 1);
+            --color-blue-700: rgba(20, 60, 110, 1);
+            --color-yellow-500: rgba(255, 193, 7, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-blue-600);
+            --color-primary-hover: var(--color-blue-700);
+            --color-primary-active: var(--color-blue-700);
+            --color-accent: var(--color-yellow-500);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --duration-normal: 250ms;
+            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-btn-primary-text: var(--color-slate-900);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: linear-gradient(135deg, #1c5498 0%, #2d5a8a 50%, #4a7ba7 100%);
+            color: var(--color-text);
+            line-height: 1.5;
+            padding: var(--space-32);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .signup-container {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 600px;
+            width: 100%;
+            padding: var(--space-32);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .signup-header h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-8);
+        }
+
+        .signup-header p {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-32);
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--color-secondary);
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 2px;
+            background-color: var(--color-primary);
+            transition: width var(--duration-normal) var(--ease-standard);
+            z-index: 1;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .progress-step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--color-secondary);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-secondary);
+            transition: all var(--duration-normal) var(--ease-standard);
+        }
+
+        .progress-step.active .progress-step-circle {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .progress-step.completed .progress-step-circle {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+            color: var(--color-btn-primary-text);
+        }
+
+        .progress-step-label {
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-8);
+            color: var(--color-text-secondary);
+        }
+
+        .progress-step.active .progress-step-label {
+            color: var(--color-text);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-8);
+        }
+
+        .form-label .required {
+            color: var(--color-error);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space-12);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            transition: border-color var(--duration-normal) var(--ease-standard);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        .form-control.error {
+            border-color: var(--color-error);
+        }
+
+        .error-message {
+            display: none;
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-8);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: var(--space-16);
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            transition: all var(--duration-normal) var(--ease-standard);
+        }
+
+        .radio-label:hover {
+            background-color: var(--color-secondary);
+        }
+
+        .radio-label input[type="radio"] {
+            margin-right: var(--space-8);
+            cursor: pointer;
+        }
+
+        .radio-label input[type="radio"]:checked + span {
+            font-weight: var(--font-weight-medium);
+        }
+
+        .otp-container {
+            display: flex;
+            gap: var(--space-12);
+            justify-content: center;
+            margin: var(--space-24) 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        .otp-info {
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-24);
+        }
+
+        .resend-otp {
+            text-align: center;
+            margin-top: var(--space-16);
+        }
+
+        .resend-otp button {
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            text-decoration: underline;
+            padding: 0;
+        }
+
+        .resend-otp button:hover {
+            color: var(--color-primary-hover);
+        }
+
+        .resend-otp button:disabled {
+            color: var(--color-text-secondary);
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: var(--space-12);
+            margin-top: var(--space-32);
+        }
+
+        .btn {
+            padding: var(--space-12) var(--space-24);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-standard);
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: #1c3c5a;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .btn-primary:hover {
+            background-color: #ffb300;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(var(--color-brown-600-rgb), 0.2);
+        }
+
+        .success-message {
+            text-align: center;
+            padding: var(--space-32);
+        }
+
+        .success-message h2 {
+            font-size: var(--font-size-2xl);
+            color: var(--color-success);
+            margin-bottom: var(--space-16);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-24);
+            border-radius: 50%;
+            background-color: var(--color-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--color-btn-primary-text);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: var(--space-16);
+            }
+
+            .signup-container {
+                padding: var(--space-24);
+            }
+
+            .otp-input {
+                width: 45px;
+                height: 45px;
+                font-size: var(--font-size-lg);
+            }
+
+            .progress-step-label {
+                font-size: 10px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>Sign Up</h1>
+            <p>Join ParkWise MLCP Solutions</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-line" id="progressLine"></div>
+            <div class="progress-step active" data-step="1">
+                <div class="progress-step-circle">1</div>
+                <div class="progress-step-label">Personal Info</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="progress-step-circle">2</div>
+                <div class="progress-step-label">Contact Details</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="progress-step-circle">3</div>
+                <div class="progress-step-label">Verification</div>
+            </div>
+        </div>
+
+        <form id="signupForm">
+            <!-- Step 1: Personal Information -->
+            <div class="form-step active" data-step="1">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name <span class="required">*</span></label>
+                    <input type="text" id="firstName" class="form-control" required>
+                    <div class="error-message" id="firstNameError">Please enter your first name</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name <span class="required">*</span></label>
+                    <input type="text" id="lastName" class="form-control" required>
+                    <div class="error-message" id="lastNameError">Please enter your last name</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="country">Country <span class="required">*</span></label>
+                    <select id="country" class="form-control" required>
+                        <option value="">Select Country</option>
+                        <option value="Ireland">Ireland</option>
+                        <option value="India">India</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="United States">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="error-message" id="countryError">Please select your country</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="county">County</label>
+                    <input type="text" id="county" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="city">City <span class="required">*</span></label>
+                    <input type="text" id="city" class="form-control" required>
+                    <div class="error-message" id="cityError">Please enter your city</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" id="nextStep1">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Contact Details -->
+            <div class="form-step" data-step="2">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" class="form-control" required>
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" class="form-control" placeholder="+353 123 456 7890" required>
+                    <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Employee Type <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="employeeType" value="employee" required>
+                            <span>Employee</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="employeeType" value="security" required>
+                            <span>Security</span>
+                        </label>
+                    </div>
+                    <div class="error-message" id="employeeTypeError">Please select an employee type</div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="prevStep2">Back</button>
+                    <button type="button" class="btn btn-primary" id="nextStep2">Send OTP</button>
+                </div>
+            </div>
+
+            <!-- Step 3: OTP Verification (5-digit) -->
+            <div class="form-step" data-step="3">
+                <div class="otp-info">
+                    <p>We've sent a verification code to your email address.</p>
+                    <p><strong id="displayEmail"></strong></p>
+                </div>
+
+                <div class="otp-container">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                </div>
+
+                <div class="resend-otp">
+                    <button type="button" id="resendOTP" disabled>Resend OTP (<span id="timer">30</span>s)</button>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="prevStep3">Back</button>
+                    <button type="button" class="btn btn-primary" id="verifyOTP">Verify &amp; Complete</button>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="form-step" data-step="4">
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <h2>Registration Successful!</h2>
+                    <p>Your account has been created successfully. You can now log in with your credentials.</p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        let generatedOTP = '';
+        let timerInterval;
+
+        // Form data storage
+        const formData = {
+            firstName: '',
+            lastName: '',
+            country: '',
+            county: '',
+            city: '',
+            email: '',
+            phone: '',
+            employeeType: ''
+        };
+
+        // Update progress bar
+        function updateProgressBar() {
+            const progressSteps = document.querySelectorAll('.progress-step');
+            const progressLine = document.getElementById('progressLine');
+            
+            progressSteps.forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressLine.style.width = progress + '%';
+        }
+
+        // Show specific step
+        function showStep(step) {
+            const formSteps = document.querySelectorAll('.form-step');
+            formSteps.forEach((formStep) => {
+                formStep.classList.remove('active');
+            });
+            
+            const targetStep = document.querySelector(`.form-step[data-step="${step}"]`);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+            
+            currentStep = step;
+            updateProgressBar();
+        }
+
+        // Validation functions
+        function validateStep1() {
+            let isValid = true;
+            
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const country = document.getElementById('country');
+            const city = document.getElementById('city');
+
+            if (firstName.value.trim() === '') {
+                showError('firstName', 'firstNameError');
+                isValid = false;
+            } else {
+                hideError('firstName', 'firstNameError');
+                formData.firstName = firstName.value.trim();
+            }
+
+            if (lastName.value.trim() === '') {
+                showError('lastName', 'lastNameError');
+                isValid = false;
+            } else {
+                hideError('lastName', 'lastNameError');
+                formData.lastName = lastName.value.trim();
+            }
+
+            if (country.value === '') {
+                showError('country', 'countryError');
+                isValid = false;
+            } else {
+                hideError('country', 'countryError');
+                formData.country = country.value;
+            }
+
+            const county = document.getElementById('county');
+            formData.county = county.value.trim(); // Optional field, no validation
+
+            if (city.value.trim() === '') {
+                showError('city', 'cityError');
+                isValid = false;
+            } else {
+                hideError('city', 'cityError');
+                formData.city = city.value.trim();
+            }
+
+            return isValid;
+        }
+
+        function validateStep2() {
+            let isValid = true;
+            
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            const employeeType = document.querySelector('input[name="employeeType"]:checked');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email.value.trim())) {
+                showError('email', 'emailError');
+                isValid = false;
+            } else {
+                hideError('email', 'emailError');
+                formData.email = email.value.trim();
+            }
+
+            if (phone.value.trim() === '') {
+                showError('phone', 'phoneError');
+                isValid = false;
+            } else {
+                hideError('phone', 'phoneError');
+                formData.phone = phone.value.trim();
+            }
+
+            if (!employeeType) {
+                showError('employeeType', 'employeeTypeError');
+                isValid = false;
+            } else {
+                hideError('employeeType', 'employeeTypeError');
+                formData.employeeType = employeeType.value;
+            }
+
+            return isValid;
+        }
+
+        function showError(fieldId, errorId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.add('error');
+            if (error) error.classList.add('show');
+        }
+
+        function hideError(fieldId, errorId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.remove('error');
+            if (error) error.classList.remove('show');
+        }
+
+        // Generate 5-digit OTP
+        function generateOTP() {
+            return Math.floor(10000 + Math.random() * 90000).toString();
+        }
+
+        // Send OTP (simulated)
+        function sendOTP() {
+            generatedOTP = generateOTP();
+            console.log('Generated OTP:', generatedOTP); // In production, this would be sent via email
+            document.getElementById('displayEmail').textContent = formData.email;
+            startTimer();
+        }
+
+        // Timer for resend OTP
+        function startTimer() {
+            let timeLeft = 30;
+            const timerElement = document.getElementById('timer');
+            const resendButton = document.getElementById('resendOTP');
+            
+            resendButton.disabled = true;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    resendButton.disabled = false;
+                    resendButton.innerHTML = 'Resend OTP';
+                }
+            }, 1000);
+        }
+
+        // OTP input handling
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '') {
+                    if (index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').slice(0, 5);
+                pastedData.split('').forEach((char, i) => {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = char;
+                    }
+                });
+                if (pastedData.length === 5) {
+                    otpInputs[4].focus();
+                }
+            });
+        });
+
+        // Verify OTP
+        function verifyOTP() {
+            let enteredOTP = '';
+            otpInputs.forEach(input => {
+                enteredOTP += input.value;
+            });
+
+            if (enteredOTP.length !== 5) {
+                alert('Please enter the complete 5-digit OTP');
+                return false;
+            }
+
+            if (enteredOTP === generatedOTP) {
+                console.log('Registration successful!', formData);
+                showStep(4);
+                return true;
+            } else {
+                alert('Invalid OTP. Please try again.');
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+                return false;
+            }
+        }
+
+        // Event listeners for navigation buttons
+        document.getElementById('nextStep1').addEventListener('click', () => {
+            if (validateStep1()) {
+                showStep(2);
+            }
+        });
+
+        document.getElementById('prevStep2').addEventListener('click', () => {
+            showStep(1);
+        });
+
+        document.getElementById('nextStep2').addEventListener('click', () => {
+            if (validateStep2()) {
+                sendOTP();
+                showStep(3);
+            }
+        });
+
+        document.getElementById('prevStep3').addEventListener('click', () => {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            showStep(2);
+        });
+
+        document.getElementById('verifyOTP').addEventListener('click', () => {
+            verifyOTP();
+        });
+
+        document.getElementById('resendOTP').addEventListener('click', () => {
+            sendOTP();
+            otpInputs.forEach(input => input.value = '');
+            otpInputs[0].focus();
+        });
+
+        // Initialize
+        updateProgressBar();
+    </script>
+</body>
+</html>
+
