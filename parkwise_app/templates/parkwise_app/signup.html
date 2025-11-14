@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -422,6 +423,16 @@
             color: var(--color-btn-primary-text);
         }
 
+        .backend-error {
+            margin-bottom: var(--space-16);
+            padding: var(--space-12);
+            border-radius: var(--radius-base);
+            background-color: rgba(192, 21, 47, 0.08);
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            display: none;
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: var(--space-16);
@@ -462,7 +473,7 @@
             </div>
             <div class="progress-step" data-step="2">
                 <div class="progress-step-circle">2</div>
-                <div class="progress-step-label">Contact Details</div>
+                <div class="progress-step-label">Account Details</div>
             </div>
             <div class="progress-step" data-step="3">
                 <div class="progress-step-circle">3</div>
@@ -470,24 +481,29 @@
             </div>
         </div>
 
-        <form id="signupForm">
+        <!-- Django form wrapper just for CSRF -->
+        <form id="signupForm" onsubmit="return false;">
+            {% csrf_token %}
+
+            <div id="backendError" class="backend-error"></div>
+
             <!-- Step 1: Personal Information -->
             <div class="form-step active" data-step="1">
                 <div class="form-group">
                     <label class="form-label" for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" class="form-control" required>
+                    <input type="text" id="firstName" name="firstName" class="form-control" required>
                     <div class="error-message" id="firstNameError">Please enter your first name</div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="lastName">Last Name <span class="required">*</span></label>
-                    <input type="text" id="lastName" class="form-control" required>
+                    <input type="text" id="lastName" name="lastName" class="form-control" required>
                     <div class="error-message" id="lastNameError">Please enter your last name</div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="country">Country <span class="required">*</span></label>
-                    <select id="country" class="form-control" required>
+                    <select id="country" name="country" class="form-control" required>
                         <option value="">Select Country</option>
                         <option value="Ireland">Ireland</option>
                         <option value="India">India</option>
@@ -504,12 +520,12 @@
 
                 <div class="form-group">
                     <label class="form-label" for="county">County</label>
-                    <input type="text" id="county" class="form-control">
+                    <input type="text" id="county" name="county" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="city">City <span class="required">*</span></label>
-                    <input type="text" id="city" class="form-control" required>
+                    <input type="text" id="city" name="city" class="form-control" required>
                     <div class="error-message" id="cityError">Please enter your city</div>
                 </div>
 
@@ -518,30 +534,34 @@
                 </div>
             </div>
 
-            <!-- Step 2: Contact Details -->
+            <!-- Step 2: Account Details (Email + Employee Code + Role) -->
             <div class="form-step" data-step="2">
                 <div class="form-group">
                     <label class="form-label" for="email">Email Address <span class="required">*</span></label>
-                    <input type="email" id="email" class="form-control" required>
+                    <input type="email" id="email" name="email" class="form-control" required>
                     <div class="error-message" id="emailError">Please enter a valid email address</div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
-                    <input type="tel" id="phone" class="form-control" placeholder="+353 123 456 7890" required>
-                    <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                    <label class="form-label" for="emp_id">Employee Code (EMPXXX) <span class="required">*</span></label>
+                    <input type="text" id="emp_id" name="emp_id" class="form-control" placeholder="EMP123" required>
+                    <div class="error-message" id="empIdError">Employee Code must be like EMP123 (EMP + digits)</div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Employee Type <span class="required">*</span></label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="employeeType" value="employee" required>
+                            <input type="radio" name="employeeType" value="Employee" required>
                             <span>Employee</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="employeeType" value="security" required>
+                            <input type="radio" name="employeeType" value="Security" required>
                             <span>Security</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="employeeType" value="Admin" required>
+                            <span>Admin</span>
                         </label>
                     </div>
                     <div class="error-message" id="employeeTypeError">Please select an employee type</div>
@@ -578,7 +598,7 @@
                 </div>
             </div>
 
-            <!-- Success Message -->
+            <!-- Step 4: Success Message -->
             <div class="form-step" data-step="4">
                 <div class="success-message">
                     <div class="success-icon">✓</div>
@@ -592,10 +612,8 @@
     <script>
         let currentStep = 1;
         const totalSteps = 3;
-        let generatedOTP = '';
         let timerInterval;
 
-        // Form data storage
         const formData = {
             firstName: '',
             lastName: '',
@@ -603,15 +621,26 @@
             county: '',
             city: '',
             email: '',
-            phone: '',
+            emp_id: '',
             employeeType: ''
         };
 
-        // Update progress bar
+        const backendErrorBox = document.getElementById('backendError');
+
+        function showBackendError(message) {
+            backendErrorBox.textContent = message;
+            backendErrorBox.style.display = 'block';
+        }
+
+        function clearBackendError() {
+            backendErrorBox.textContent = '';
+            backendErrorBox.style.display = 'none';
+        }
+
         function updateProgressBar() {
             const progressSteps = document.querySelectorAll('.progress-step');
             const progressLine = document.getElementById('progressLine');
-            
+
             progressSteps.forEach((step, index) => {
                 if (index + 1 < currentStep) {
                     step.classList.add('completed');
@@ -628,30 +657,44 @@
             progressLine.style.width = progress + '%';
         }
 
-        // Show specific step
         function showStep(step) {
             const formSteps = document.querySelectorAll('.form-step');
             formSteps.forEach((formStep) => {
                 formStep.classList.remove('active');
             });
-            
+
             const targetStep = document.querySelector(`.form-step[data-step="${step}"]`);
             if (targetStep) {
                 targetStep.classList.add('active');
             }
-            
+
             currentStep = step;
             updateProgressBar();
         }
 
-        // Validation functions
+        function showError(fieldId, errorId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.add('error');
+            if (error) error.classList.add('show');
+        }
+
+        function hideError(fieldId, errorId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            if (field) field.classList.remove('error');
+            if (error) error.classList.remove('show');
+        }
+
         function validateStep1() {
+            clearBackendError();
             let isValid = true;
-            
+
             const firstName = document.getElementById('firstName');
             const lastName = document.getElementById('lastName');
             const country = document.getElementById('country');
             const city = document.getElementById('city');
+            const county = document.getElementById('county');
 
             if (firstName.value.trim() === '') {
                 showError('firstName', 'firstNameError');
@@ -677,9 +720,6 @@
                 formData.country = country.value;
             }
 
-            const county = document.getElementById('county');
-            formData.county = county.value.trim(); // Optional field, no validation
-
             if (city.value.trim() === '') {
                 showError('city', 'cityError');
                 isValid = false;
@@ -688,14 +728,17 @@
                 formData.city = city.value.trim();
             }
 
+            formData.county = county.value.trim();
+
             return isValid;
         }
 
         function validateStep2() {
+            clearBackendError();
             let isValid = true;
-            
+
             const email = document.getElementById('email');
-            const phone = document.getElementById('phone');
+            const empId = document.getElementById('emp_id');
             const employeeType = document.querySelector('input[name="employeeType"]:checked');
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -707,64 +750,41 @@
                 formData.email = email.value.trim();
             }
 
-            if (phone.value.trim() === '') {
-                showError('phone', 'phoneError');
+            const empIdRegex = /^EMP\d{3,}$/;
+            if (!empIdRegex.test(empId.value.trim())) {
+                showError('emp_id', 'empIdError');
                 isValid = false;
             } else {
-                hideError('phone', 'phoneError');
-                formData.phone = phone.value.trim();
+                hideError('emp_id', 'empIdError');
+                formData.emp_id = empId.value.trim();
             }
 
             if (!employeeType) {
-                showError('employeeType', 'employeeTypeError');
+                document.getElementById('employeeTypeError').classList.add('show');
                 isValid = false;
             } else {
-                hideError('employeeType', 'employeeTypeError');
+                document.getElementById('employeeTypeError').classList.remove('show');
                 formData.employeeType = employeeType.value;
             }
 
             return isValid;
         }
 
-        function showError(fieldId, errorId) {
-            const field = document.getElementById(fieldId);
-            const error = document.getElementById(errorId);
-            if (field) field.classList.add('error');
-            if (error) error.classList.add('show');
-        }
-
-        function hideError(fieldId, errorId) {
-            const field = document.getElementById(fieldId);
-            const error = document.getElementById(errorId);
-            if (field) field.classList.remove('error');
-            if (error) error.classList.remove('show');
-        }
-
-        // Generate 5-digit OTP
-        function generateOTP() {
-            return Math.floor(10000 + Math.random() * 90000).toString();
-        }
-
-        // Send OTP (simulated)
-        function sendOTP() {
-            generatedOTP = generateOTP();
-            console.log('Generated OTP:', generatedOTP); // In production, this would be sent via email
-            document.getElementById('displayEmail').textContent = formData.email;
-            startTimer();
-        }
-
-        // Timer for resend OTP
         function startTimer() {
             let timeLeft = 30;
             const timerElement = document.getElementById('timer');
             const resendButton = document.getElementById('resendOTP');
-            
+
             resendButton.disabled = true;
-            
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
             timerInterval = setInterval(() => {
                 timeLeft--;
                 timerElement.textContent = timeLeft;
-                
+
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     resendButton.disabled = false;
@@ -773,7 +793,80 @@
             }, 1000);
         }
 
-        // OTP input handling
+        function getCsrfToken() {
+            const csrfInput = document.querySelector('input[name=csrfmiddlewaretoken]');
+            return csrfInput ? csrfInput.value : '';
+        }
+
+        async function sendOtpToBackend() {
+            clearBackendError();
+
+            const form = new FormData();
+            form.append('firstName', formData.firstName);
+            form.append('lastName', formData.lastName);
+            form.append('email', formData.email);
+            form.append('emp_id', formData.emp_id);
+            form.append('employeeType', formData.employeeType);
+
+            try {
+                const response = await fetch("{% url 'send_signup_otp' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCsrfToken()
+                    },
+                    body: form
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    showBackendError(result.error || "Failed to send OTP.");
+                    return false;
+                }
+
+                // Success
+                document.getElementById('displayEmail').textContent = formData.email;
+                startTimer();
+                return true;
+
+            } catch (error) {
+                console.error("Error sending OTP:", error);
+                showBackendError("Error connecting to server while sending OTP.");
+                return false;
+            }
+        }
+
+        async function verifyOtpWithBackend(enteredOTP) {
+            clearBackendError();
+            const form = new FormData();
+            form.append("otp", enteredOTP);
+
+            try {
+                const response = await fetch("{% url 'verify_signup_otp' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCsrfToken()
+                    },
+                    body: form
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    showBackendError(result.error || "OTP verification failed.");
+                    return false;
+                }
+
+                return true;
+
+            } catch (error) {
+                console.error("Error verifying OTP:", error);
+                showBackendError("Error connecting to server while verifying OTP.");
+                return false;
+            }
+        }
+
+        // OTP input behaviour
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
@@ -806,31 +899,15 @@
             });
         });
 
-        // Verify OTP
-        function verifyOTP() {
+        function getEnteredOTP() {
             let enteredOTP = '';
             otpInputs.forEach(input => {
                 enteredOTP += input.value;
             });
-
-            if (enteredOTP.length !== 5) {
-                alert('Please enter the complete 5-digit OTP');
-                return false;
-            }
-
-            if (enteredOTP === generatedOTP) {
-                console.log('Registration successful!', formData);
-                showStep(4);
-                return true;
-            } else {
-                alert('Invalid OTP. Please try again.');
-                otpInputs.forEach(input => input.value = '');
-                otpInputs[0].focus();
-                return false;
-            }
+            return enteredOTP;
         }
 
-        // Event listeners for navigation buttons
+        // Button event listeners
         document.getElementById('nextStep1').addEventListener('click', () => {
             if (validateStep1()) {
                 showStep(2);
@@ -841,9 +918,13 @@
             showStep(1);
         });
 
-        document.getElementById('nextStep2').addEventListener('click', () => {
-            if (validateStep2()) {
-                sendOTP();
+        document.getElementById('nextStep2').addEventListener('click', async () => {
+            if (!validateStep2()) return;
+
+            const success = await sendOtpToBackend();
+            if (success) {
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
                 showStep(3);
             }
         });
@@ -855,14 +936,32 @@
             showStep(2);
         });
 
-        document.getElementById('verifyOTP').addEventListener('click', () => {
-            verifyOTP();
+        document.getElementById('verifyOTP').addEventListener('click', async () => {
+            const enteredOTP = getEnteredOTP();
+
+            if (enteredOTP.length !== 5) {
+                alert('Please enter the complete 5-digit OTP');
+                return;
+            }
+
+            const success = await verifyOtpWithBackend(enteredOTP);
+            if (success) {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                showStep(4);
+            } else {
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+            }
         });
 
-        document.getElementById('resendOTP').addEventListener('click', () => {
-            sendOTP();
-            otpInputs.forEach(input => input.value = '');
-            otpInputs[0].focus();
+        document.getElementById('resendOTP').addEventListener('click', async () => {
+            const success = await sendOtpToBackend();
+            if (success) {
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+            }
         });
 
         // Initialize
@@ -870,4 +969,5 @@
     </script>
 </body>
 </html>
+
 

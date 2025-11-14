@@ -1,0 +1,143 @@
+{% extends 'parkwise_app/base.html' %}
+{% block title %}Security Dashboard{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <h1 class="display-5 fw-bold">Security Dashboard</h1>
+  <p class="lead">
+    Validate entry/exit OTPs, monitor vehicle movement, and assist employees at the gate.
+  </p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <!-- Quick Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Vehicles Inside</small>
+        <h3 class="mt-2 mb-0">{{ active_bookings|default:0 }}</h3>
+        <p class="text-muted mb-0">Currently active parking sessions.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Pending Entry</small>
+        <h3 class="mt-2 mb-0">{{ pending_entry|default:0 }}</h3>
+        <p class="text-muted mb-0">Bookings awaiting entry OTP validation.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Pending Exit</small>
+        <h3 class="mt-2 mb-0">{{ pending_exit|default:0 }}</h3>
+        <p class="text-muted mb-0">Vehicles waiting for exit OTP approval.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP Validation -->
+  <div class="row g-4 mb-4">
+
+    <!-- Entry OTP -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 p-3">
+        <h5 class="fw-semibold mb-2">Entry OTP Validation</h5>
+        <p class="text-muted small">
+          Validate the OTP provided by the employee before raising the entry barrier.
+        </p>
+
+        <form method="post" action="{% url 'validate_entry_otp_security' %}">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Enter Entry OTP</label>
+            <input type="text" maxlength="5" name="otp" class="form-control" required placeholder="5-digit OTP">
+          </div>
+
+          <button class="btn btn-success btn-sm">
+            <i class="bi bi-door-open"></i> Validate & Open Gate
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Exit OTP -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 p-3">
+        <h5 class="fw-semibold mb-2">Exit OTP Validation</h5>
+        <p class="text-muted small">
+          Validate the exit OTP before allowing the vehicle to leave and freeing the bay.
+        </p>
+
+        <form method="post" action="{% url 'validate_exit_otp_security' %}">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Enter Exit OTP</label>
+            <input type="text" maxlength="5" name="otp" class="form-control" required placeholder="5-digit OTP">
+          </div>
+
+          <button class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-door-closed"></i> Validate & Close Session
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Movements -->
+  <div class="card shadow-sm rounded-4 p-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="fw-semibold mb-0">Recent Movements</h5>
+      <small class="text-muted">Last 10 entries & exits</small>
+    </div>
+
+    {% if recent_bookings %}
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th width="120">Time</th>
+            <th>Employee</th>
+            <th>Code</th>
+            <th>Bay</th>
+            <th>Zone</th>
+            <th>Level</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in recent_bookings %}
+          <tr>
+            <td>
+              {% if b.entry_time %}<span class="text-success">Entry {{ b.entry_time|date:"H:i" }}</span><br>{% endif %}
+              {% if b.exit_time %}<span class="text-danger">Exit {{ b.exit_time|date:"H:i" }}</span>{% endif %}
+            </td>
+            <td>{{ b.user.first_name }} {{ b.user.last_name }}</td>
+            <td>
+              {% for prof in b.user.employeeprofile_set.all %}
+                {{ prof.emp_id }}
+              {% endfor %}
+            </td>
+            <td>{{ b.slot.slot_number }}</td>
+            <td>{{ b.slot.zone }}</td>
+            <td>{{ b.slot.level }}</td>
+            <td class="text-capitalize">{{ b.state }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-muted mb-0">No movement history yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+

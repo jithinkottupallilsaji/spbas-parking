@@ -1,0 +1,311 @@
+{% extends 'parkwise_app/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <h1 class="display-5 fw-bold">Admin Dashboard</h1>
+  <p class="lead">Configure floors & bays, manage users, and monitor parking operations in real time.</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <!-- Top Stats Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center text-white bg-success p-3 rounded-4 shadow-sm">
+        <small class="text-uppercase">Available Bays</small>
+        <h2 class="mt-1 mb-0">{{ available_bays|default:0 }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center text-white bg-warning p-3 rounded-4 shadow-sm">
+        <small class="text-uppercase">Reserved Bays</small>
+        <h2 class="mt-1 mb-0">{{ reserved_bays|default:0 }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center text-white bg-danger p-3 rounded-4 shadow-sm">
+        <small class="text-uppercase">Occupied Bays</small>
+        <h2 class="mt-1 mb-0">{{ occupied_bays|default:0 }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center text-white bg-primary p-3 rounded-4 shadow-sm">
+        <small class="text-uppercase">Total Bays</small>
+        <h2 class="mt-1 mb-0">{{ total_bays|default:0 }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Second stats row -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm p-3 rounded-4">
+        <small class="text-muted text-uppercase">Registered Users</small>
+        <div class="d-flex justify-content-between align-items-end mt-2">
+          <h3 class="mb-0">{{ total_users|default:0 }}</h3>
+          <span class="badge bg-light text-dark"><i class="bi bi-people-fill"></i> Employees & Security</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm p-3 rounded-4">
+        <small class="text-muted text-uppercase">Today’s Bookings</small>
+        <div class="d-flex justify-content-between align-items-end mt-2">
+          <h3 class="mb-0">{{ todays_bookings|default:0 }}</h3>
+          <span class="badge bg-light text-dark"><i class="bi bi-calendar-check"></i> For {{ today|default:"Today" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm p-3 rounded-4">
+        <small class="text-muted text-uppercase">Active Vehicles Inside</small>
+        <div class="d-flex justify-content-between align-items-end mt-2">
+          <h3 class="mb-0">{{ active_bookings|default:0 }}</h3>
+          <span class="badge bg-light text-dark"><i class="bi bi-car-front"></i> Entry OTP validated</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bay Management -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-semibold mb-0">Bay Management</h4>
+
+      <div class="d-flex gap-2">
+        <!-- Generate Demo Bays -->
+        <form method="post" action="{% url 'generate_demo_bays' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-magic"></i> Generate Demo Bays
+          </button>
+        </form>
+
+        <!-- Add Bay -->
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBayModal">
+          <i class="bi bi-plus-circle"></i> Add Bay
+        </button>
+      </div>
+    </div>
+
+    <div class="card p-3 shadow-sm rounded-4">
+      {% if bays %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Slot #</th>
+              <th>Zone</th>
+              <th>Level</th>
+              <th>Status</th>
+              <th>Reserved By</th>
+              <th>Reserved Until</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bay in bays %}
+            <tr>
+              <td><strong>{{ bay.slot_number }}</strong></td>
+              <td>{{ bay.zone }}</td>
+              <td>{{ bay.level }}</td>
+              <td>
+                {% if bay.status == "available" %}
+                  <span class="badge bg-success">Available</span>
+                {% elif bay.status == "reserved" %}
+                  <span class="badge bg-warning text-dark">Reserved</span>
+                {% else %}
+                  <span class="badge bg-danger">Occupied</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if bay.reserved_by %}
+                  {{ bay.reserved_by.first_name }} {{ bay.reserved_by.last_name }}
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if bay.reserved_until %}
+                  {{ bay.reserved_until|date:"M d, Y H:i" }}
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="alert alert-info mb-0">
+          <i class="bi bi-info-circle"></i> No bays found. Use <strong>Add Bay</strong> or <strong>Generate Demo Bays</strong> to create sample data.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- User Management -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-semibold mb-0">User Management</h4>
+      <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="bi bi-person-plus"></i> Add User
+      </button>
+    </div>
+
+    <div class="card p-3 shadow-sm rounded-4">
+      {% if employees %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Employee Code</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for emp in employees %}
+            <tr>
+              <td>{{ emp.emp_id }}</td>
+              <td>{{ emp.user.first_name }} {{ emp.user.last_name }}</td>
+              <td>{{ emp.get_role_display|default:emp.role }}</td>
+              <td>{{ emp.user.email }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="alert alert-info mb-0">
+          <i class="bi bi-info-circle"></i> No users yet. Use <strong>Add User</strong> to onboard employees or security staff.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- System Monitoring -->
+  <div class="mb-4">
+    <h4 class="fw-semibold mb-3">System Monitoring & Alerts</h4>
+    <div class="card p-3 shadow-sm rounded-4">
+      <p class="mb-1">
+        <i class="bi bi-activity text-danger"></i>
+        <strong>Application Health:</strong>
+        All core services responding within acceptable thresholds. (Placeholder for AWS CloudWatch)
+      </p>
+      <p class="mb-1">
+        <i class="bi bi-bell text-warning"></i>
+        <strong>OTP Delivery:</strong>
+        SNS email/SMS OTP success rate: <strong>98–100%</strong> (simulated metric for project demo).
+      </p>
+      <p class="mb-0">
+        <i class="bi bi-shield-lock text-success"></i>
+        <strong>Security:</strong>
+        Role-based dashboards active (Admin / Employee / Security), audit logs can be exported in future phases.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Add Bay Modal -->
+<div class="modal fade" id="addBayModal" tabindex="-1" aria-labelledby="addBayModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'add_bay' %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBayModalLabel">Add New Bay</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Slot Number (e.g. A-001)</label>
+          <input type="text" name="slot_number" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Zone</label>
+          <select name="zone" class="form-select" required>
+            <option value="">Select Zone</option>
+            <option value="Zone A">Zone A</option>
+            <option value="Zone B">Zone B</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Level</label>
+          <select name="level" class="form-select" required>
+            <option value="">Select Level</option>
+            <option value="Ground Floor">Ground Floor</option>
+            <option value="Level 1">Level 1</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Initial Status</label>
+          <select name="status" class="form-select">
+            <option value="available">Available</option>
+            <option value="reserved">Reserved</option>
+            <option value="occupied">Occupied</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Bay</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'add_user' %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">First Name</label>
+          <input type="text" name="first_name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Last Name</label>
+          <input type="text" name="last_name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Employee Code (EMPXXX)</label>
+          <input type="text" name="emp_id" class="form-control" placeholder="EMP123" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Role</label>
+          <select name="role" class="form-select" required>
+            <option value="">Select Role</option>
+            <option value="Employee">Employee</option>
+            <option value="Security">Security</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <p class="small text-muted mb-0">
+          A temporary password will be auto-generated on the backend for this account.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+

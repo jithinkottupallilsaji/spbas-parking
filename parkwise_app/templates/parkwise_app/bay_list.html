@@ -1,17 +1,82 @@
-<!DOCTYPE html>
-<html>
-<head><title>Parking Bays</title></head>
-<body>
-    <h1>Parking Bays</h1>
-    <ul>
+{% extends 'parkwise_app/base.html' %}
+{% block title %}Parking Bays{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <h1 class="display-5 fw-bold">Parking Bay Overview</h1>
+  <p class="lead">View all parking bays, their status, zone, and level.</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <!-- Bay List Card -->
+  <div class="card shadow-sm p-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-semibold">Parking Bays</h4>
+      <a href="/admin-dashboard/" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+      </a>
+    </div>
+
+    {% if bays %}
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Slot Number</th>
+          <th>Zone</th>
+          <th>Level</th>
+          <th>Status</th>
+          <th>Reserved By</th>
+          <th>Reserved Until</th>
+        </tr>
+      </thead>
+
+      <tbody>
         {% for bay in bays %}
-            <li>
-                {{ bay.number }} –
-                {% if bay.available %}Available{% else %}Occupied{% endif %}
-            </li>
-        {% empty %}
-            <li>No bays found.</li>
+        <tr>
+          <td><strong>{{ bay.slot_number }}</strong></td>
+          <td>{{ bay.zone }}</td>
+          <td>{{ bay.level }}</td>
+
+          <td>
+            {% if bay.status == "available" %}
+              <span class="badge bg-success">Available</span>
+            {% elif bay.status == "reserved" %}
+              <span class="badge bg-warning text-dark">Reserved</span>
+            {% else %}
+              <span class="badge bg-danger">Occupied</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if bay.reserved_by %}
+              {{ bay.reserved_by.first_name }} {{ bay.reserved_by.last_name }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+
+          <td>
+            {% if bay.reserved_until %}
+              {{ bay.reserved_until|date:"M d, Y H:i" }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
         {% endfor %}
-    </ul>
-</body>
-</html>
+      </tbody>
+    </table>
+
+    {% else %}
+    <div class="alert alert-info text-center">
+      <i class="bi bi-info-circle"></i> No parking bays found.
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'parkwise_app/base.html' %}
+
+{% block title %}Book Parking Bay{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <h1 class="display-5 fw-bold">Book a Parking Bay</h1>
+  <p class="lead">Reserve a bay in advance or let the system choose the best available spot.</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+
+    <!-- LEFT: FORM -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-4 rounded-4">
+
+        <h4 class="fw-semibold mb-3">
+          <i class="bi bi-calendar2-check me-2"></i> Reserve Parking
+        </h4>
+
+        <form method="POST" action="{% url 'book_bay' %}">
+          {% csrf_token %}
+
+          {% if can_book_for_others %}
+          <!-- Booking For -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Booking For</label>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="booking_mode" id="modeSelf"
+                     value="self" checked>
+              <label class="form-check-label" for="modeSelf">
+                Myself ({{ request.user.first_name }} {{ request.user.last_name }})
+              </label>
+            </div>
+
+            <div class="form-check mt-1">
+              <input class="form-check-input" type="radio" name="booking_mode" id="modeOther"
+                     value="other">
+              <label class="form-check-label" for="modeOther">
+                Another Employee (via EMP Code)
+              </label>
+            </div>
+          </div>
+
+          <!-- EMP ID Input -->
+          <div class="mb-3" id="empCodeGroup" style="display:none;">
+            <label class="form-label fw-semibold">Employee Code (EMPXXX)</label>
+            <input type="text" name="emp_id" class="form-control" placeholder="EMP123">
+            <small class="text-muted">Security/Admin can reserve parking for employees.</small>
+          </div>
+          {% endif %}
+
+          <!-- Booking Date -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Booking Date</label>
+            <input type="date" name="booking_date" class="form-control"
+                   value="{{ today|date:'Y-m-d' }}" required>
+          </div>
+
+          <!-- Bay Selection -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Bay</label>
+            <select class="form-select" name="slot_choice">
+              <option value="auto">Auto-select Best Available</option>
+
+              {% for slot in available_slots %}
+                <option value="{{ slot.id }}">
+                  {{ slot.slot_number }} — {{ slot.zone }} / {{ slot.level }}
+                </option>
+              {% empty %}
+                <option disabled>No bays available currently</option>
+              {% endfor %}
+            </select>
+            <small class="text-muted">Leave on Auto for fastest booking.</small>
+          </div>
+
+          <button class="btn btn-primary w-100 mt-2">
+            <i class="bi bi-check2-circle me-1"></i> Confirm Booking
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: AVAILABILITY SUMMARY -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-4 mb-3 rounded-4">
+        <h5 class="fw-semibold mb-3">
+          <i class="bi bi-info-circle me-2"></i>Bay Availability
+        </h5>
+
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            Total Bays
+            <span class="badge bg-secondary">{{ total_slots }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            Available
+            <span class="badge bg-success">{{ available_count }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            Reserved
+            <span class="badge bg-warning text-dark">{{ reserved_count }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            Occupied
+            <span class="badge bg-danger">{{ occupied_count }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card shadow-sm p-3 rounded-4">
+        <h6 class="fw-semibold mb-2">Booking Tips</h6>
+        <ul class="small mb-0">
+          <li>Auto-assign gives you the quickest booking.</li>
+          <li>Security/Admin can reserve for employees using EMPXXX.</li>
+          <li>Entry/Exit OTPs control gate operations and session timing.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modeSelf = document.getElementById('modeSelf');
+  const modeOther = document.getElementById('modeOther');
+  const empGroup  = document.getElementById('empCodeGroup');
+
+  if (modeSelf && modeOther) {
+    const toggle = () => empGroup.style.display = modeOther.checked ? "block" : "none";
+    modeSelf.addEventListener('change', toggle);
+    modeOther.addEventListener('change', toggle);
+    toggle();
+  }
+});
+</script>
+{% endblock %}
+

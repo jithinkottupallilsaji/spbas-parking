@@ -1,0 +1,197 @@
+{% extends 'parkwise_app/base.html' %}
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <h1 class="display-5 fw-bold">Employee Dashboard</h1>
+  <p class="lead">
+    Welcome {{ request.user.first_name|default:"Employee" }} – manage bookings, OTPs & your parking history.
+  </p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Today’s Booking</small>
+        {% if active_booking %}
+          <h4 class="mt-2">{{ active_booking.slot.slot_number }}</h4>
+          <p class="text-muted mb-0">
+            Status: <strong>{{ active_booking.state }}</strong> <br>
+            Date: {{ active_booking.booking_date }}
+          </p>
+        {% else %}
+          <p class="text-muted mt-2 mb-0">No booking today.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Total Visits</small>
+        <h3 class="mt-2 mb-0">{{ total_visits|default:0 }}</h3>
+        <p class="text-muted mb-0">Completed parking sessions</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 rounded-4">
+        <small class="text-uppercase text-muted">Favourite Zone</small>
+        <h4 class="mt-2 mb-0">Not enough data</h4>
+        <p class="text-muted mb-0">Will appear after 5+ visits</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Booking Card -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 p-3">
+
+        <h5 class="mb-2">Book a Parking Bay</h5>
+        <p class="text-muted small">Choose a bay, or auto-assign the nearest available bay.</p>
+
+        <form method="post" action="{% url 'book_bay' %}">
+          {% csrf_token %}
+
+          <input type="hidden" name="booking_mode" value="self">
+
+          <div class="mb-3">
+            <label class="form-label">Select Bay</label>
+            <select name="slot_choice" class="form-select">
+              <option value="auto">Auto-select available bay</option>
+              {% for bay in available_bays_list %}
+                <option value="{{ bay.id }}">
+                  {{ bay.slot_number }} ({{ bay.zone }} - {{ bay.level }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Booking Date</label>
+              <input type="date" name="booking_date" class="form-control" value="{{ default_booking_date }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Expected Duration (hours)</label>
+              <input type="number" class="form-control" min="1" value="2">
+            </div>
+          </div>
+
+          <button class="btn btn-primary"><i class="bi bi-calendar-check"></i> Confirm Booking</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- OTP + Pricing Section -->
+    <div class="col-lg-6">
+
+      <!-- Entry OTP -->
+      <div class="card shadow-sm rounded-4 p-3 mb-3">
+        <h5>Entry OTP</h5>
+        <form method="post" action="{% url 'validate_entry_otp' %}">
+          {% csrf_token %}
+          <input type="text" maxlength="5" name="otp" class="form-control mb-2" placeholder="Enter OTP" required>
+          <button class="btn btn-success btn-sm"><i class="bi bi-unlock"></i> Validate & Enter</button>
+        </form>
+      </div>
+
+      <!-- Exit OTP -->
+      <div class="card shadow-sm rounded-4 p-3 mb-3">
+        <h5>Exit OTP</h5>
+        <form method="post" action="{% url 'generate_exit_otp' %}">
+          {% csrf_token %}
+          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-shield-check"></i> Request Exit OTP</button>
+        </form>
+      </div>
+
+      <!-- Pricing Summary Box -->
+      <div class="card shadow-sm p-4 rounded-4">
+        <h5 class="fw-bold mb-2">💳 Parking Cost Summary</h5>
+
+        {% if active_booking and active_booking.cost %}
+          <div class="alert alert-info">
+            Last Charge: <strong>€{{ active_booking.cost }}</strong>
+          </div>
+        {% else %}
+          <p class="text-muted">No completed sessions yet.</p>
+        {% endif %}
+
+        <hr>
+
+        <h6 class="fw-bold">🧮 Cost Calculator</h6>
+
+        <div class="mb-2">
+          <label class="form-label">Hours:</label>
+          <input type="number" id="calcHours" class="form-control" min="1" value="1">
+        </div>
+
+        <button class="btn btn-primary w-100 mb-2" onclick="calculateCost()">Calculate</button>
+
+        <div id="costResult" class="alert alert-secondary text-center" style="display:none;"></div>
+      </div>
+
+      <script>
+        function calculateCost() {
+          let hrs = parseInt(document.getElementById("calcHours").value);
+          let cost = hrs * 4;  // €4 per hour
+          let box = document.getElementById("costResult");
+          box.innerHTML = "<strong>€" + cost + "</strong>";
+          box.style.display = "block";
+        }
+      </script>
+
+    </div>
+  </div>
+
+  <!-- Booking History -->
+  <div class="card shadow-sm rounded-4 p-3 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Recent Parking History</h5>
+      <small class="text-muted">Last 10 visits</small>
+    </div>
+
+    {% if recent_bookings %}
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Slot</th>
+              <th>Zone</th>
+              <th>Level</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in recent_bookings %}
+            <tr>
+              <td>{{ b.booking_date }}</td>
+              <td>{{ b.slot.slot_number }}</td>
+              <td>{{ b.slot.zone }}</td>
+              <td>{{ b.slot.level }}</td>
+              <td>{{ b.entry_time|date:"H:i" }}</td>
+              <td>{{ b.exit_time|date:"H:i" }}</td>
+              <td>{{ b.state }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted">No booking history yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
