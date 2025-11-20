@@ -26,9 +26,12 @@ urlpatterns = [
     # -----------------------------
     # Admin Actions
     # -----------------------------
-    path("admin/add-bay/", views.add_bay, name="add_bay"),
-    path("admin/generate-demo-bays/", views.generate_demo_bays, name="generate_demo_bays"),
-    path("admin/add-user/", views.add_user, name="add_user"),
+    path("spbas-admin/add-bay/", views.add_bay, name="add_bay"),
+    path("spbas-admin/generate-demo-bays/", views.generate_demo_bays, name="generate_demo_bays"),
+    path("spbas-admin/add-user/", views.add_user, name="add_user"),
+    path("spbas-admin/delete-bay/<str:slot_number>/", views.delete_bay, name="delete_bay"),
+    path("spbas-admin/edit-bay/<str:slot_number>/", views.edit_bay, name="edit_bay"),
+
 
     # -----------------------------
     # Employee Actions
@@ -48,4 +51,7 @@ urlpatterns = [
     # -----------------------------
     path("signup/send-otp/", views.send_signup_otp, name="send_signup_otp"),
     path("signup/verify-otp/", views.verify_signup_otp, name="verify_signup_otp"),
+    
+   
+
 ]

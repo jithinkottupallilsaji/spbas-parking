@@ -174,23 +174,24 @@ def login_view(request):
         try:
             profile = EmployeeProfile.objects.get(user=user)
         except EmployeeProfile.DoesNotExist:
-            messages.error(request, "Profile missing.")
+            messages.error(request, "Profile not found.")
             return redirect("home")
 
+        # ROLE MISMATCH PREVENTION
         if profile.role.lower() != selected_role.lower():
-            messages.error(
-                request,
-                f"Incorrect role. You are registered as {profile.role}.",
-            )
+            messages.error(request, f"Incorrect role. You are registered as {profile.role}.")
             return redirect("home")
 
         login(request, user)
 
-        if profile.role.lower() == "admin":
+        # REDIRECT BY ROLE
+        role = profile.role.lower()
+
+        if role == "admin":
             return redirect("admin_dashboard")
-        if profile.role.lower() == "employee":
+        elif role == "employee":
             return redirect("employee_dashboard")
-        if profile.role.lower() == "security":
+        elif role == "security":
             return redirect("security_dashboard")
 
         return redirect("home")
@@ -210,9 +211,14 @@ def logout_view(request):
 
 @login_required
 def admin_dashboard(request):
-    today = timezone.localdate()
+    profile = EmployeeProfile.objects.get(user=request.user)
+    if profile.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("home")
 
+    today = timezone.localdate()
     context = {
+
         "available_bays": Slot.objects.filter(status="available").count(),
         "reserved_bays": Slot.objects.filter(status="reserved").count(),
         "occupied_bays": Slot.objects.filter(status="occupied").count(),
@@ -248,6 +254,63 @@ def add_bay(request):
             messages.error(request, "Bay already exists.")
     return redirect("admin_dashboard")
 
+@login_required
+def delete_bay(request, slot_number):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    if profile.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("home")
+
+    try:
+        slot = Slot.objects.get(slot_number=slot_number)
+        slot.delete()
+
+        # Remove also from DynamoDB
+        try:
+            item = SlotDDB.get(slot_number)
+            item.delete()
+        except Exception:
+            pass
+
+        messages.success(request, f"Bay {slot_number} deleted successfully.")
+    except Slot.DoesNotExist:
+        messages.error(request, "Bay not found.")
+
+    return redirect("admin_dashboard")
+@login_required
+def edit_bay(request, slot_number):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    if profile.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("home")
+
+    try:
+        bay = Slot.objects.get(slot_number=slot_number)
+    except Slot.DoesNotExist:
+        messages.error(request, "Bay not found.")
+        return redirect("admin_dashboard")
+
+    if request.method == "POST":
+        bay.zone = request.POST.get("zone")
+        bay.level = request.POST.get("level")
+        bay.status = request.POST.get("status")
+        bay.save()
+
+        # Sync with DynamoDB
+        try:
+            item = SlotDDB.get(slot_number)
+            item.zone = bay.zone
+            item.level = bay.level
+            item.status = bay.status
+            item.save()
+        except Exception:
+            pass
+
+        messages.success(request, f"Bay {slot_number} updated successfully.")
+        return redirect("admin_dashboard")
+
+    # For GET request return data (not used)
+    return redirect("admin_dashboard")
 
 @login_required
 def generate_demo_bays(request):
@@ -316,7 +379,13 @@ def add_user(request):
 
 @login_required
 def employee_dashboard(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    if profile.role != "employee":
+        messages.error(request, "Access denied.")
+        return redirect("home")
+
     user = request.user
+
     today = timezone.localdate()
 
     context = {
@@ -596,7 +665,13 @@ def verify_signup_otp(request):
 
 @login_required
 def security_dashboard(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    if profile.role != "security":
+        messages.error(request, "Access denied.")
+        return redirect("home")
+
     context = {
+
         "active_bookings": Booking.objects.filter(state="active").count(),
         "pending_entry": Booking.objects.filter(state="pending").count(),
         "pending_exit": Booking.objects.filter(
@@ -607,3 +682,39 @@ def security_dashboard(request):
     }
 
     return render(request, "parkwise_app/security_dashboard.html", context)
+# ---------------------------------------------------------
+# AUTO-CREATE TEST USERS (Admin, Employee, Security)
+# ---------------------------------------------------------
+
+def create_test_users():
+    TEST_USERS = [
+        ("admin@spbas.com", "admin", "EMP9991"),
+        ("employee1@spbas.com", "employee", "EMP9992"),
+        ("security1@spbas.com", "security", "EMP9993"),
+    ]
+
+    for email, role, emp_id in TEST_USERS:
+        if not User.objects.filter(email=email).exists():
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password="Tech@1990",
+                first_name=role.capitalize(),
+                last_name="User",
+            )
+
+            profile = EmployeeProfile.objects.create(
+                user=user,
+                emp_id=emp_id,
+                role=role
+            )
+            print(f"✔ Created test user: {email} ({role})")
+        else:
+            print(f"✔ Test user already exists: {email}")
+
+
+# Call on server start
+try:
+    create_test_users()
+except Exception as e:
+    print("Test user bootstrap skipped:", e)

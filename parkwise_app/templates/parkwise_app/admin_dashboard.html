@@ -105,6 +105,7 @@
               <th>Status</th>
               <th>Reserved By</th>
               <th>Reserved Until</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -136,6 +137,27 @@
                   <span class="text-muted">—</span>
                 {% endif %}
               </td>
+
+              <!-- ACTION BUTTONS -->
+              <td class="d-flex gap-2">
+
+                <!-- EDIT -->
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
+                        data-bs-target="#editBayModal-{{ bay.slot_number }}">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+
+                <!-- DELETE -->
+                <form method="post" action="{% url 'delete_bay' bay.slot_number %}"
+                      onsubmit="return confirm('Delete bay {{ bay.slot_number }}?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+
+              </td>
+
             </tr>
             {% endfor %}
           </tbody>
@@ -149,7 +171,7 @@
     </div>
   </div>
 
-  <!-- User Management -->
+  <!-- USER MANAGEMENT -->
   <div class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="fw-semibold mb-0">User Management</h4>
@@ -190,7 +212,7 @@
     </div>
   </div>
 
-  <!-- System Monitoring -->
+  <!-- SYSTEM MONITORING -->
   <div class="mb-4">
     <h4 class="fw-semibold mb-3">System Monitoring & Alerts</h4>
     <div class="card p-3 shadow-sm rounded-4">
@@ -202,15 +224,16 @@
       <p class="mb-1">
         <i class="bi bi-bell text-warning"></i>
         <strong>OTP Delivery:</strong>
-        SNS email/SMS OTP success rate: <strong>98–100%</strong> (simulated metric for project demo).
+        SNS email/SMS OTP success rate: <strong>98–100%</strong> (simulated metric).
       </p>
       <p class="mb-0">
         <i class="bi bi-shield-lock text-success"></i>
         <strong>Security:</strong>
-        Role-based dashboards active (Admin / Employee / Security), audit logs can be exported in future phases.
+        Role-based dashboards active. Logs export in future phases.
       </p>
     </div>
   </div>
+
 </div>
 
 <!-- Add Bay Modal -->
@@ -220,7 +243,7 @@
       {% csrf_token %}
       <div class="modal-header">
         <h5 class="modal-title" id="addBayModalLabel">Add New Bay</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
@@ -260,52 +283,56 @@
   </div>
 </div>
 
-<!-- Add User Modal -->
-<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+<!-- Edit Bay Modal (Generated Per Bay) -->
+{% for bay in bays %}
+<div class="modal fade" id="editBayModal-{{ bay.slot_number }}" tabindex="-1">
   <div class="modal-dialog">
-    <form method="post" action="{% url 'add_user' %}" class="modal-content">
+    <form method="post" action="{% url 'edit_bay' bay.slot_number %}" class="modal-content">
       {% csrf_token %}
       <div class="modal-header">
-        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">Edit {{ bay.slot_number }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
+
         <div class="mb-3">
-          <label class="form-label">First Name</label>
-          <input type="text" name="first_name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Last Name</label>
-          <input type="text" name="last_name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Employee Code (EMPXXX)</label>
-          <input type="text" name="emp_id" class="form-control" placeholder="EMP123" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Role</label>
-          <select name="role" class="form-select" required>
-            <option value="">Select Role</option>
-            <option value="Employee">Employee</option>
-            <option value="Security">Security</option>
-            <option value="Admin">Admin</option>
+          <label class="form-label">Zone</label>
+          <select name="zone" class="form-select" required>
+            <option value="Zone A" {% if bay.zone == "Zone A" %}selected{% endif %}>Zone A</option>
+            <option value="Zone B" {% if bay.zone == "Zone B" %}selected{% endif %}>Zone B</option>
           </select>
         </div>
-        <p class="small text-muted mb-0">
-          A temporary password will be auto-generated on the backend for this account.
-        </p>
+
+        <div class="mb-3">
+          <label class="form-label">Level</label>
+          <select name="level" class="form-select" required>
+            <option value="Ground Floor" {% if bay.level == "Ground Floor" %}selected{% endif %}>Ground Floor</option>
+            <option value="Level 1" {% if bay.level == "Level 1" %}selected{% endif %}>Level 1</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select">
+            <option value="available" {% if bay.status == "available" %}selected{% endif %}>Available</option>
+            <option value="reserved" {% if bay.status == "reserved" %}selected{% endif %}>Reserved</option>
+            <option value="occupied" {% if bay.status == "occupied" %}selected{% endif %}>Occupied</option>
+          </select>
+        </div>
+
       </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create User</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
       </div>
+
     </form>
   </div>
 </div>
+{% endfor %}
 
 {% endblock %}
+
 

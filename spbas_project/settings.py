@@ -19,7 +19,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-a-yy4%0*=%v73-e13#gks0i-yda@-h8hqy^#r1yqjm23xqs84n'
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+
+# Cloud9 requires wildcard host
+ALLOWED_HOSTS = [
+    "*",
+    ".vfs.cloud9.us-east-1.amazonaws.com",
+]
+
+
+# ---------------------------------------------------------
+# CSRF TRUSTED ORIGINS (Required for Cloud9 HTTPS login)
+# ---------------------------------------------------------
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vfs.cloud9.us-east-1.amazonaws.com",
+]
 
 
 # ---------------------------------------------------------
@@ -126,6 +140,7 @@ USE_TZ = True
 # ---------------------------------------------------------
 
 STATIC_URL = "/static/"
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
